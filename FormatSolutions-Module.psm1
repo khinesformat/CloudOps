@@ -1,4 +1,4 @@
-﻿    <#
+    <#
     .Synopsis
        This is a module written for Format Solutions
     .DESCRIPTION
