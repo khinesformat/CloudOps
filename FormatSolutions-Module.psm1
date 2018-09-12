@@ -413,7 +413,7 @@ function Move-AzureRMVMSubscription {
     $SourceSubscription = Get-AzureRmSubscription | Select Name, ID |  Out-GridView -OutputMode Single -Title 'Please select the source subscription'
     Select-AzureRmSubscription -SubscriptionId $SourceSubscription.Id | Out-Null
 
-    $DestinationSubscription = Get-AzureRmSubscription | Select Name, ID |  Out-GridView -OutputMode Single -Title 'Please select the source subscription'
+    $DestinationSubscription = Get-AzureRmSubscription | Select Name, ID |  Out-GridView -OutputMode Single -Title 'Please select the destination subscription'
 
     $NewvNet = Get-AzureRmVirtualNetwork | Select Name, ResourceGroupName | Out-GridView -OutputMode Single -Title 'Please select the new network'
     $NewNetwork = (Get-AzureRmVirtualNetwork -Name $NewvNet.Name -ResourceGroupName $NewvNet.ResourceGroupName).Subnets | Select Name | Out-GridView -OutputMode Single -Title 'Please select the new Subnet'
