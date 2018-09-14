@@ -1,7 +1,35 @@
+#region ConnectAs
+$connectionName = "AzureRunAsConnection"
+try
+{
+# Get the connection "AzureRunAsConnection "
+$servicePrincipalConnection=Get-AutomationConnection -Name $connectionName         
+
+"Logging in to Azure..."
+Add-AzureRmAccount `
+    -ServicePrincipal `
+    -TenantId $servicePrincipalConnection.TenantId `
+    -ApplicationId $servicePrincipalConnection.ApplicationId `
+    -CertificateThumbprint $servicePrincipalConnection.CertificateThumbprint 
+}
+catch {
+    if (!$servicePrincipalConnection)
+    {
+        $ErrorMessage = "Connection $connectionName not found."
+        throw $ErrorMessage
+    } else{
+        Write-Error -Message $_.Exception
+        throw $_.Exception
+    }
+}
+#endregion ConnectAs
+
+#region Variables
 $ExtensionsNeeded =@('BGInfo','joindomain','MicrosoftMonitoringAgent')
-$VMs = Get-AzureRMVM
+$VMs = Get-AzureRMVM | Where-Object {$_Name -match "Brill"}
 $DSCAccount = "EUS-AAA-FS-Dev"
 $DSCRG = "EUS-RSG-ALL-DEV"
+#endregion Variables
 
 #region Functions
 function joindomain {
@@ -59,9 +87,9 @@ foreach ($VM in $VMS) {
     }
 
     if ($PoweredUp -eq $false) {Write-Host "Powering off VM, $VMName."; Stop-AzureRmVM -ResourceGroupName $VMRG -Name $VMName -Force}
-}
 
     if (!(Get-AzureRmAutomationDscNode -AutomationAccountName $DSCAccount -ResourceGroupName $DSCRG -Name $VMName )) {
         Write-Host "The host, $VMName, is not in DSC."
         Register-AzureRmAutomationDscNode -AutomationAccountName $DSCAccount -ResourceGroupName $DSCRG -AzureVMName $VMName -NodeConfigurationName "CyberSecurityDSC.localhost"
     }
+}
